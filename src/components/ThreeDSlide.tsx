@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF, useAnimations, Environment } from "@react-three/drei";
+import { OrbitControls, useGLTF, useAnimations, Environment, Text } from "@react-three/drei";
 import { SlideConfig } from "@/types/slide";
 import * as THREE from "three";
 
@@ -62,16 +62,6 @@ function Model({ filePath }: ModelProps) {
       </mesh>
     );
   }
-}
-
-// Simple Text component for error messages
-function Text({ children, ...props }: any) {
-  return (
-    <mesh {...props}>
-      <textGeometry args={[children, { size: 0.1, height: 0.05 }]} />
-      <meshStandardMaterial color="white" />
-    </mesh>
-  );
 }
 
 interface ThreeDSlideProps {
