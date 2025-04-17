@@ -16,6 +16,7 @@ const SlidePlayer = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
+        console.log("Fetching configuration...");
         const response = await fetch('/config.json');
         if (!response.ok) {
           throw new Error("Failed to load configuration file");
@@ -52,13 +53,16 @@ const SlidePlayer = () => {
 
   // Set up timer for automatic transitions
   useEffect(() => {
-    if (!config || config.files.length === 0 || !configLoaded) return;
+    if (!config || !configLoaded || config.files.length === 0) return;
     
     const currentSlide = config.files[currentSlideIndex];
-    console.log("Setting up timer for slide:", currentSlide);
+    console.log("Setting up timer for slide:", currentSlideIndex, currentSlide);
     const timer = setTimeout(goToNextSlide, currentSlide.rotation_time * 1000);
     
-    return () => clearTimeout(timer);
+    return () => {
+      console.log("Cleaning up timer for slide:", currentSlideIndex);
+      clearTimeout(timer);
+    };
   }, [currentSlideIndex, config, goToNextSlide, configLoaded]);
 
   // Error state
@@ -74,10 +78,10 @@ const SlidePlayer = () => {
   }
 
   // Loading state
-  if (loading || !config || config.files.length === 0 || !configLoaded) {
+  if (loading || !configLoaded || !config || config.files.length === 0) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-black text-white">
-        <p>Loading...</p>
+        <p className="text-xl">Loading presentation...</p>
       </div>
     );
   }

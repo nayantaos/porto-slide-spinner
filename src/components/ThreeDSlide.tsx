@@ -11,13 +11,23 @@ interface ModelProps {
 
 function Model({ filePath }: ModelProps) {
   const group = useRef<THREE.Group>(null!);
-  const [modelError, setModelError] = useState<boolean>(false);
+  const [loadError, setLoadError] = useState<boolean>(false);
   
-  // Add error handling for model loading
-  let modelPath = filePath;
+  useEffect(() => {
+    // Reset error state when filePath changes
+    setLoadError(false);
+  }, [filePath]);
   
   try {
-    const { scene, animations } = useGLTF(modelPath);
+    if (loadError) {
+      throw new Error("Model failed to load");
+    }
+    
+    const { scene, animations } = useGLTF(filePath, undefined, (error) => {
+      console.error("Error loading GLB model:", error);
+      setLoadError(true);
+    });
+    
     const { actions } = useAnimations(animations, group);
 
     // Play all animations if they exist
@@ -45,21 +55,23 @@ function Model({ filePath }: ModelProps) {
       </group>
     );
   } catch (error) {
-    console.error("Error loading model:", error);
+    console.error("Error rendering model:", error);
     
     // Fallback to a simple box mesh if model fails to load
     return (
-      <mesh>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="hotpink" />
+      <group>
+        <mesh>
+          <boxGeometry args={[2, 2, 2]} />
+          <meshStandardMaterial color="hotpink" />
+        </mesh>
         <Text 
-          position={[0, 0, 1.1]} 
-          fontSize={0.1}
+          position={[0, 0, 2.1]} 
+          fontSize={0.25}
           color="white"
         >
-          Model Not Found
+          3D Model Placeholder
         </Text>
-      </mesh>
+      </group>
     );
   }
 }

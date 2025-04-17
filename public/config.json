@@ -1,8 +1,7 @@
 
 {
   "files": [
-    { "file": "/models/placeholder.glb", "rotation_time": 20, "type": "3d" },
-    { "file": "/videos/placeholder.mp4", "rotation_time": 30, "type": "video" },
-    { "file": "/models/placeholder.glb", "rotation_time": 20, "type": "3d" }
+    { "file": "/videos/placeholder.mp4", "rotation_time": 10, "type": "video" },
+    { "file": "/models/placeholder.glb", "rotation_time": 10, "type": "3d" }
   ]
 }
