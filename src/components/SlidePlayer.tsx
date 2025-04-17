@@ -10,6 +10,7 @@ const SlidePlayer = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [fadeOut, setFadeOut] = useState<boolean>(false);
+  const [configLoaded, setConfigLoaded] = useState<boolean>(false);
 
   // Fetch configuration
   useEffect(() => {
@@ -20,7 +21,9 @@ const SlidePlayer = () => {
           throw new Error("Failed to load configuration file");
         }
         const data = await response.json();
+        console.log("Config loaded successfully:", data);
         setConfig(data);
+        setConfigLoaded(true);
       } catch (err) {
         setError("Error loading configuration: " + (err instanceof Error ? err.message : String(err)));
         console.error("Error loading configuration:", err);
@@ -49,13 +52,14 @@ const SlidePlayer = () => {
 
   // Set up timer for automatic transitions
   useEffect(() => {
-    if (!config || config.files.length === 0) return;
+    if (!config || config.files.length === 0 || !configLoaded) return;
     
     const currentSlide = config.files[currentSlideIndex];
+    console.log("Setting up timer for slide:", currentSlide);
     const timer = setTimeout(goToNextSlide, currentSlide.rotation_time * 1000);
     
     return () => clearTimeout(timer);
-  }, [currentSlideIndex, config, goToNextSlide]);
+  }, [currentSlideIndex, config, goToNextSlide, configLoaded]);
 
   // Error state
   if (error) {
@@ -70,7 +74,7 @@ const SlidePlayer = () => {
   }
 
   // Loading state
-  if (loading || !config || config.files.length === 0) {
+  if (loading || !config || config.files.length === 0 || !configLoaded) {
     return (
       <div className="w-full h-screen flex items-center justify-center bg-black text-white">
         <p>Loading...</p>
