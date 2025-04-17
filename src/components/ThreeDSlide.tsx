@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, useAnimations, Environment } from "@react-three/drei";
 import { SlideConfig } from "@/types/slide";
@@ -11,32 +11,66 @@ interface ModelProps {
 
 function Model({ filePath }: ModelProps) {
   const group = useRef<THREE.Group>(null!);
-  const { scene, animations } = useGLTF(filePath);
-  const { actions } = useAnimations(animations, group);
+  const [modelError, setModelError] = useState<boolean>(false);
+  
+  // Add error handling for model loading
+  let modelPath = filePath;
+  
+  try {
+    const { scene, animations } = useGLTF(modelPath);
+    const { actions } = useAnimations(animations, group);
 
-  // Play all animations if they exist
-  useEffect(() => {
-    if (animations.length > 0) {
-      // Get the first animation name
-      const animationName = Object.keys(actions)[0];
-      if (animationName) {
-        const action = actions[animationName];
-        if (action) {
-          action.play();
+    // Play all animations if they exist
+    useEffect(() => {
+      if (animations.length > 0) {
+        // Get the first animation name
+        const animationName = Object.keys(actions)[0];
+        if (animationName) {
+          const action = actions[animationName];
+          if (action) {
+            action.play();
+          }
         }
       }
-    }
-  }, [actions, animations]);
+    }, [actions, animations]);
 
+    return (
+      <group ref={group}>
+        <primitive 
+          object={scene} 
+          scale={1}
+          position={[0, 0, 0]} 
+          rotation={[0, 0, 0]}
+        />
+      </group>
+    );
+  } catch (error) {
+    console.error("Error loading model:", error);
+    
+    // Fallback to a simple box mesh if model fails to load
+    return (
+      <mesh>
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial color="hotpink" />
+        <Text 
+          position={[0, 0, 1.1]} 
+          fontSize={0.1}
+          color="white"
+        >
+          Model Not Found
+        </Text>
+      </mesh>
+    );
+  }
+}
+
+// Simple Text component for error messages
+function Text({ children, ...props }: any) {
   return (
-    <group ref={group}>
-      <primitive 
-        object={scene} 
-        scale={1}
-        position={[0, 0, 0]} 
-        rotation={[0, 0, 0]}
-      />
-    </group>
+    <mesh {...props}>
+      <textGeometry args={[children, { size: 0.1, height: 0.05 }]} />
+      <meshStandardMaterial color="white" />
+    </mesh>
   );
 }
 

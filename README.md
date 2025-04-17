@@ -23,6 +23,27 @@ A slide player application designed for the Porto Hologram device, capable of di
 4. Configure your slide sequence by editing `public/config.json`
 5. Run the application with `npm run dev`
 
+## Important: Adding 3D Models
+
+**To fix the "Could not load models" error:**
+
+You must add actual GLB format 3D model files to the `public/models/` directory. The application is currently configured to use placeholder files, but these aren't actual 3D models.
+
+To add your own 3D models:
+1. Export 3D models from Blender, Maya, or other 3D software in GLB format
+2. Place the .glb files in the `public/models/` directory
+3. Update `public/config.json` to reference your model files
+
+For example:
+```
+{
+  "files": [
+    { "file": "/models/your-actual-model.glb", "rotation_time": 20, "type": "3d" },
+    { "file": "/videos/your-actual-video.mp4", "rotation_time": 30, "type": "video" }
+  ]
+}
+```
+
 ## Configuration
 
 Edit the `public/config.json` file to define your slides:
@@ -30,8 +51,8 @@ Edit the `public/config.json` file to define your slides:
 ```json
 {
   "files": [
-    { "file": "models/your-model.glb", "rotation_time": 20, "type": "3d" },
-    { "file": "videos/your-video.mp4", "rotation_time": 30, "type": "video" }
+    { "file": "/models/your-model.glb", "rotation_time": 20, "type": "3d" },
+    { "file": "/videos/your-video.mp4", "rotation_time": 30, "type": "video" }
   ]
 }
 ```
