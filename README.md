@@ -1,73 +1,58 @@
-# Welcome to your Lovable project
 
-## Project info
+# Porto Hologram Slide Player
 
-**URL**: https://lovable.dev/projects/d3eaca8f-8ed1-4ffd-8633-523f172450ab
+A slide player application designed for the Porto Hologram device, capable of displaying a sequence of 3D models and videos in portrait orientation.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Displays 3D .glb models using Three.js with auto-rotation and lighting
+- Plays video files in full-screen portrait mode
+- Automatically transitions between slides based on configured timings
+- Loops through content indefinitely
+- Full-screen experience with no UI controls
+- Portrait orientation support (1080x1920)
+- Configurable via a simple JSON file
 
-**Use Lovable**
+## Setup Instructions
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/d3eaca8f-8ed1-4ffd-8633-523f172450ab) and start prompting.
+1. Clone the repository
+2. Install dependencies with `npm install`
+3. Add your content:
+   - Place .glb model files in the `public/models/` directory
+   - Place video files in the `public/videos/` directory
+4. Configure your slide sequence by editing `public/config.json`
+5. Run the application with `npm run dev`
 
-Changes made via Lovable will be committed automatically to this repo.
+## Configuration
 
-**Use your preferred IDE**
+Edit the `public/config.json` file to define your slides:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```json
+{
+  "files": [
+    { "file": "models/your-model.glb", "rotation_time": 20, "type": "3d" },
+    { "file": "videos/your-video.mp4", "rotation_time": 30, "type": "video" }
+  ]
+}
 ```
 
-**Edit a file directly in GitHub**
+Each slide entry has the following properties:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- `file`: Path to the media file (relative to the public directory)
+- `rotation_time`: Duration to display the slide in seconds
+- `type`: Either "3d" for GLB models or "video" for video files
 
-**Use GitHub Codespaces**
+## Running in Kiosk Mode
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+For a dedicated display setup, you can run the application in kiosk mode using a Chromium-based browser:
 
-## What technologies are used for this project?
+```
+chromium-browser --kiosk http://localhost:3000
+```
 
-This project is built with:
+## Technical Notes
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/d3eaca8f-8ed1-4ffd-8633-523f172450ab) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- 3D models are loaded using Three.js and displayed with appropriate lighting
+- Videos are displayed using HTML5 video elements with autoplay and muted settings
+- The player automatically transitions between slides based on the rotation_time setting
+- Smooth fade transitions are used between slides

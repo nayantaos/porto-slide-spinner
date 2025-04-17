@@ -1,0 +1,8 @@
+
+{
+  "files": [
+    { "file": "models/model1.glb", "rotation_time": 20, "type": "3d" },
+    { "file": "videos/video1.mp4", "rotation_time": 30, "type": "video" },
+    { "file": "models/model2.glb", "rotation_time": 20, "type": "3d" }
+  ]
+}
