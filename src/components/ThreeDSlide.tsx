@@ -23,10 +23,22 @@ function Model({ filePath }: ModelProps) {
       throw new Error("Model failed to load");
     }
     
-    const { scene, animations } = useGLTF(filePath, undefined, (error) => {
-      console.error("Error loading GLB model:", error);
-      setLoadError(true);
-    });
+    // Note: useGLTF doesn't accept an error callback as the third parameter
+    // It accepts an object with a draco property, so we need to handle errors differently
+    const { scene, animations } = useGLTF(filePath);
+    
+    // Add error handling through a separate useEffect
+    useEffect(() => {
+      const onError = (event: ErrorEvent) => {
+        if (event.message.includes(filePath)) {
+          console.error("Error loading GLB model:", event.message);
+          setLoadError(true);
+        }
+      };
+      
+      window.addEventListener('error', onError);
+      return () => window.removeEventListener('error', onError);
+    }, [filePath]);
     
     const { actions } = useAnimations(animations, group);
 
