@@ -1,20 +1,22 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, useAnimations, Environment, Text } from "@react-three/drei";
 import { SlideConfig } from "@/types/slide";
 import * as THREE from "three";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Skeleton } from "./ui/skeleton";
 
 interface ModelProps {
   filePath: string;
+  onLoad?: () => void;
 }
 
-function Model({ filePath }: ModelProps) {
+function Model({ filePath, onLoad }: ModelProps) {
   const group = useRef<THREE.Group>(null!);
   const [loadError, setLoadError] = useState<boolean>(false);
   
   useEffect(() => {
-    // Reset error state when filePath changes
     setLoadError(false);
   }, [filePath]);
   
@@ -23,11 +25,8 @@ function Model({ filePath }: ModelProps) {
       throw new Error("Model failed to load");
     }
     
-    // Note: useGLTF doesn't accept an error callback as the third parameter
-    // It accepts an object with a draco property, so we need to handle errors differently
     const { scene, animations } = useGLTF(filePath);
     
-    // Add error handling through a separate useEffect
     useEffect(() => {
       const onError = (event: ErrorEvent) => {
         if (event.message.includes(filePath)) {
@@ -37,15 +36,19 @@ function Model({ filePath }: ModelProps) {
       };
       
       window.addEventListener('error', onError);
+      
+      // Call onLoad callback when model is ready
+      if (onLoad) {
+        onLoad();
+      }
+      
       return () => window.removeEventListener('error', onError);
-    }, [filePath]);
+    }, [filePath, onLoad]);
     
     const { actions } = useAnimations(animations, group);
 
-    // Play all animations if they exist
     useEffect(() => {
       if (animations.length > 0) {
-        // Get the first animation name
         const animationName = Object.keys(actions)[0];
         if (animationName) {
           const action = actions[animationName];
@@ -69,7 +72,6 @@ function Model({ filePath }: ModelProps) {
   } catch (error) {
     console.error("Error rendering model:", error);
     
-    // Fallback to a simple box mesh if model fails to load
     return (
       <group>
         <mesh>
@@ -79,7 +81,7 @@ function Model({ filePath }: ModelProps) {
         <Text 
           position={[0, 0, 2.1]} 
           fontSize={0.25}
-          color="white"
+          color="black"
         >
           3D Model Placeholder
         </Text>
@@ -94,13 +96,28 @@ interface ThreeDSlideProps {
 
 const ThreeDSlide = ({ slide }: ThreeDSlideProps) => {
   const isMobile = useIsMobile();
+  const [isLoading, setIsLoading] = useState(true);
   
-  // Adjust camera position and FOV based on device orientation
-  const cameraPosition = isMobile ? [0, 0, 8] : [0, 0, 5];
+  const cameraPosition = new THREE.Vector3(0, 0, isMobile ? 8 : 5);
   const cameraFov = isMobile ? 70 : 50;
 
+  const handleModelLoad = () => {
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full bg-white flex items-center justify-center">
+        <div className="space-y-4">
+          <Skeleton className="h-[200px] w-[200px] rounded-lg" />
+          <Skeleton className="h-4 w-[200px]" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-full bg-black">
+    <div className="w-full h-full bg-white">
       <Canvas
         camera={{ position: cameraPosition, fov: cameraFov }}
         gl={{ 
@@ -108,15 +125,29 @@ const ThreeDSlide = ({ slide }: ThreeDSlideProps) => {
           preserveDrawingBuffer: true
         }}
       >
-        <ambientLight intensity={0.5} />
-        <spotLight
-          position={[10, 10, 10]}
-          angle={0.15}
-          penumbra={1}
-          intensity={1}
+        {/* Ambient light for base illumination */}
+        <ambientLight intensity={0.3} />
+        
+        {/* Key light from top */}
+        <directionalLight
+          position={[0, 5, 0]}
+          intensity={0.5}
+          castShadow
         />
-        <pointLight position={[-10, -10, -10]} intensity={0.5} />
-        <Model filePath={slide.file} />
+        
+        {/* Fill light from right */}
+        <directionalLight
+          position={[5, 0, 0]}
+          intensity={0.4}
+        />
+        
+        {/* Fill light from left */}
+        <directionalLight
+          position={[-5, 0, 0]}
+          intensity={0.4}
+        />
+
+        <Model filePath={slide.file} onLoad={handleModelLoad} />
         <OrbitControls 
           autoRotate 
           autoRotateSpeed={1} 
@@ -132,3 +163,4 @@ const ThreeDSlide = ({ slide }: ThreeDSlideProps) => {
 };
 
 export default ThreeDSlide;
+
