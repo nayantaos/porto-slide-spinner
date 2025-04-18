@@ -97,7 +97,11 @@ const ThreeDSlide = ({ slide }: ThreeDSlideProps) => {
     <div className="w-full h-full bg-black">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 50 }}
-        gl={{ antialias: true, preserveDrawingBuffer: true }}
+        gl={{ 
+          antialias: true, 
+          preserveDrawingBuffer: true
+          // Removed LinearEncoding reference that no longer exists
+        }}
       >
         <ambientLight intensity={0.5} />
         <spotLight
