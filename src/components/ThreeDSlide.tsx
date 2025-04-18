@@ -1,9 +1,9 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF, useAnimations, Environment, Text } from "@react-three/drei";
 import { SlideConfig } from "@/types/slide";
 import * as THREE from "three";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ModelProps {
   filePath: string;
@@ -93,14 +93,19 @@ interface ThreeDSlideProps {
 }
 
 const ThreeDSlide = ({ slide }: ThreeDSlideProps) => {
+  const isMobile = useIsMobile();
+  
+  // Adjust camera position and FOV based on device orientation
+  const cameraPosition = isMobile ? [0, 0, 8] : [0, 0, 5];
+  const cameraFov = isMobile ? 70 : 50;
+
   return (
     <div className="w-full h-full bg-black">
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
+        camera={{ position: cameraPosition, fov: cameraFov }}
         gl={{ 
           antialias: true, 
           preserveDrawingBuffer: true
-          // Removed LinearEncoding reference that no longer exists
         }}
       >
         <ambientLight intensity={0.5} />
